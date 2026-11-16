@@ -1,4 +1,4 @@
-# Mastermind · Ideas que Suman
+# Mastermind · Ideas que Suman (Silban360)
 
 App web (pensada para móvil) para gamificar un centro de entrenamiento personal: los socios envían sugerencias para mejorar el centro y facturar más, y ganan puntos, niveles, insignias y premios.
 
@@ -46,3 +46,10 @@ Colecciones: `members`, `suggestions`, `reviews`, `votes`, `redemptions`, `deliv
 ## Próximos pasos
 
 Para usarla con socios reales: desplegar en un hosting propio (p. ej. Vercel) y sustituir `makeDbStore` por un backend con login (p. ej. Supabase o Firebase).
+
+## Identidad visual (Silban360)
+
+- Color principal: `#018792` (verde azulado) · oscuro `#015F67`
+- Texto: `#383D3D` (gris antracita)
+- Acento: `#D00023` (rojo)
+- Tipografías: **Bebas Neue** (titulares y botones) y **Source Sans** (texto)

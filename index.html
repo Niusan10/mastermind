@@ -183,6 +183,19 @@ h1,h2,h3,.cond{font-family:'Bebas Neue',system-ui,sans-serif;font-weight:400;let
 .tag{font-size:11px;font-weight:700;padding:2px 7px;border-radius:99px;background:var(--acc-l);color:var(--acc-d);margin-left:6px;vertical-align:middle}
 .chk{display:flex;gap:10px;align-items:flex-start;background:var(--card2);padding:12px;border-radius:12px;font-size:14px}
 .chk input{width:20px;height:20px;flex:none;margin-top:1px;accent-color:var(--acc)}
+.wx{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding:2px 2px 4px;margin:0 -2px}
+.wx::-webkit-scrollbar{display:none}
+.wxd{flex:1 0 62px;background:var(--card2);border-radius:14px;padding:10px 4px;text-align:center}
+.wxd.today{background:var(--acc);color:#fff}
+.wxd .d{font-size:12px;font-weight:700;text-transform:capitalize}
+.wxd .i{font-size:26px;line-height:1.3}
+.wxd .mx{font-family:'Bebas Neue',system-ui,sans-serif;font-size:22px;line-height:1}
+.wxd .mn{font-size:13px;color:var(--mut)}
+.wxd.today .mn,.wxd.today .r{color:rgba(255,255,255,.85)}
+.wxd .r{font-size:11px;color:var(--info);margin-top:3px;font-weight:600}
+.wxsum{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.wxsum .i{font-size:40px}
+.wxsum b{font-size:17px;display:block}
 .spin{width:36px;height:36px;border:4px solid var(--line);border-top-color:var(--acc);border-radius:50%;animation:sp 0.8s linear infinite;margin:0 auto 14px}
 @keyframes sp{to{transform:rotate(360deg)}}
 </style>
@@ -254,6 +267,35 @@ const fmtDate = t => { if(!t) return ''; const d=new Date(t), now=Date.now(), di
   return d.toLocaleDateString('es-ES',{day:'numeric',month:'short'}); };
 const eur = n => (n||0).toLocaleString('es-ES') + ' €';
 const rules = () => ({...DEFAULT_RULES, ...(S.config.main?.rules||{})});
+const WX={0:['☀️','Despejado'],1:['🌤️','Casi despejado'],2:['⛅','Nubes y claros'],3:['☁️','Nublado'],45:['🌫️','Niebla'],48:['🌫️','Niebla'],51:['🌦️','Llovizna'],53:['🌦️','Llovizna'],55:['🌦️','Llovizna'],56:['🌧️','Llovizna helada'],57:['🌧️','Llovizna helada'],61:['🌧️','Lluvia débil'],63:['🌧️','Lluvia'],65:['🌧️','Lluvia fuerte'],66:['🌧️','Lluvia helada'],67:['🌧️','Lluvia helada'],71:['🌨️','Nieve débil'],73:['🌨️','Nieve'],75:['❄️','Nieve fuerte'],77:['🌨️','Granizo fino'],80:['🌦️','Chubascos'],81:['🌧️','Chubascos'],82:['⛈️','Chubascos fuertes'],85:['🌨️','Chubascos de nieve'],86:['❄️','Chubascos de nieve'],95:['⛈️','Tormenta'],96:['⛈️','Tormenta con granizo'],99:['⛈️','Tormenta con granizo']};
+const wxInfo = c => WX[c] || ['🌡️','—'];
+const weatherLoc = () => S.config.main?.weather || {name:'Huesca', lat:42.1361, lon:-0.4087};
+async function loadWeather(){
+  const L=weatherLoc(), key=L.lat+','+L.lon;
+  if(S.wxKey===key && (S.weather||S.wxLoading)) return;
+  S.wxKey=key; S.wxLoading=true; S.wxError=false;
+  const CK='iqs_wx_'+key;
+  try{ const c=JSON.parse(localStorage.getItem(CK)||'null'); if(c && Date.now()-c.t<3600e3){ S.weather=c.w; S.wxLoading=false; scheduleRender(); return; } }catch(e){}
+  try{
+    const u=`https://api.open-meteo.com/v1/forecast?latitude=${L.lat}&longitude=${L.lon}&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=Europe%2FMadrid&forecast_days=7`;
+    const r=await fetch(u); if(!r.ok) throw new Error(r.status);
+    const j=await r.json(), d=j.daily;
+    const w=d.time.map((t,i)=>({date:t,code:d.weather_code[i],max:Math.round(d.temperature_2m_max[i]),min:Math.round(d.temperature_2m_min[i]),rain:d.precipitation_probability_max?.[i]??null}));
+    S.weather=w; try{ localStorage.setItem(CK,JSON.stringify({t:Date.now(),w})); }catch(e){}
+  }catch(e){ S.weather=null; S.wxError=true; }
+  S.wxLoading=false; scheduleRender();
+}
+function vTiempo(){
+  const L=weatherLoc(); loadWeather();
+  const head=`<div class="sec">El tiempo esta semana <span class="muted small" style="font-family:inherit">📍 ${esc(L.name)}</span></div>`;
+  if(!S.weather) return head+`<div class="card muted small">${S.wxError?'No se ha podido cargar el tiempo ahora mismo. Vuelve a intentarlo más tarde.':'Cargando el tiempo…'}</div>`;
+  const days=S.weather, t=days[0], ti=wxInfo(t.code);
+  const lbl=(ds,i)=>{ if(i===0) return 'Hoy'; if(i===1) return 'Mañana'; const d=new Date(ds+'T12:00:00'); return d.toLocaleDateString('es-ES',{weekday:'short'}).replace('.','')+' '+d.getDate(); };
+  return head+`<div class="card">
+    <div class="wxsum"><div class="i">${ti[0]}</div><div><b>Hoy: ${esc(ti[1])}</b><span class="muted small">Máx. ${t.max}° · Mín. ${t.min}°${t.rain!=null?` · Lluvia ${t.rain}%`:''}</span></div></div>
+    <div class="wx">${days.map((d,i)=>{ const x=wxInfo(d.code); return `<div class="wxd ${i===0?'today':''}" title="${esc(x[1])}"><div class="d">${esc(lbl(d.date,i))}</div><div class="i">${x[0]}</div><div class="mx">${d.max}°</div><div class="mn">${d.min}°</div>${d.rain!=null?`<div class="r">💧${d.rain}%</div>`:''}</div>`; }).join('')}</div>
+  </div>`;
+}
 const rewards = () => (S.config.main?.rewards && S.config.main.rewards.length) ? S.config.main.rewards : DEFAULT_REWARDS;
 const centerName = () => S.config.main?.centerName || 'Silban360';
 const challenge = () => S.config.main?.challenge || null; // {cat, mult}
@@ -411,6 +453,7 @@ function vInicio(P,me){
     <div class="stat"><b>${s.implemented||0}</b><span>Implantadas</span></div>
   </div>
   <button class="btn" data-go="nueva">💡 Enviar una idea</button>
+  ${vTiempo()}
   <div class="sec">Insignias</div>
   <div class="badges">${BADGES.map(b=>`<div class="badge ${b.test(s)?'on':''}"><em>${b.em}</em>${esc(b.name)}</div>`).join('')}</div>
   <div class="sec">Cómo ganar puntos</div>
@@ -560,6 +603,7 @@ function vAdmSettings(){
   const num=(k,t)=>`<div class="field"><label>${t}</label><input type="number" min="0" id="rl-${k}" value="${R[k]}"></div>`;
   return `<div class="card">
     <div class="field" style="margin-top:0"><label>Nombre del centro</label><input id="cfg-name" value="${esc(S.config.main?.centerName||'')}" placeholder="Ej.: Pablo Training Studio"></div>
+    <div class="field"><label>Ciudad para el tiempo de la semana</label><input id="cfg-city" value="${esc(weatherLoc().name)}" placeholder="Ej.: Huesca"></div>
   </div>
   <div class="sec">Puntos por acción</div>
   <div class="card">${num('submit','Enviar una idea')}${num('approve','Idea aprobada')}${num('implement','Idea implantada')}${num('voteReceived','Cada voto recibido')}${num('voteGiven','Cada voto dado')}</div>
@@ -697,7 +741,15 @@ async function act(a){
   if(a==='cfgsave'){
     const r={}; Object.keys(DEFAULT_RULES).forEach(k=>{ const v=$('#rl-'+k); r[k]=Math.max(0,Math.round(+v.value||0)); });
     const c=$('#ch-cat').value; const ch=c?{cat:c,mult:+$('#ch-mult').value}:null;
-    await saveConfig({rules:r,challenge:ch,centerName:$('#cfg-name').value.trim().slice(0,40)}); render(); toast('Ajustes guardados ✅');
+    const patch={rules:r,challenge:ch,centerName:$('#cfg-name').value.trim().slice(0,40)};
+    const city=$('#cfg-city').value.trim();
+    if(city && city.toLowerCase()!==String(weatherLoc().name).toLowerCase()){
+      try{ const g=await (await fetch('https://geocoding-api.open-meteo.com/v1/search?count=1&language=es&name='+encodeURIComponent(city))).json();
+        const x=g.results&&g.results[0]; if(!x) return toast('No encuentro esa ciudad',1);
+        patch.weather={name:x.name,lat:x.latitude,lon:x.longitude}; }
+      catch(e){ return toast('No se pudo buscar la ciudad ahora',1); }
+    }
+    await saveConfig(patch); render(); toast('Ajustes guardados ✅');
   }
   if(a==='demoreset'){ store.reset(); toast('Datos de ejemplo restablecidos'); }
 }

@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0E0F12">
+<title>Ideas que Suman · Club de Mejora</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0E0F12; --card:#17191F; --card2:#1F2229; --line:#2A2E37;
+  --txt:#F4F4F5; --mut:#9CA0AB; --acc:#C6F432; --acc2:#FF6B35; --ok:#3DDC97; --bad:#FF5C7A; --info:#5CC8FF;
+  --r:18px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{background:var(--bg);color:var(--txt);font-family:'Barlow',system-ui,sans-serif;font-size:16px;line-height:1.4}
+body{min-height:100vh;padding-top:env(safe-area-inset-top)}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
+input,textarea,select{font:inherit;color:var(--txt);background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:12px 14px;width:100%;outline:none}
+input:focus,textarea:focus,select:focus{border-color:var(--acc)}
+textarea{resize:vertical;min-height:110px}
+h1,h2,h3,.cond{font-family:'Barlow Condensed',sans-serif;letter-spacing:.01em}
+.app{max-width:520px;margin:0 auto;padding:0 16px calc(110px + env(safe-area-inset-bottom))}
+
+/* header */
+.top{display:flex;align-items:center;justify-content:space-between;padding:14px 0 10px;position:sticky;top:0;background:linear-gradient(var(--bg) 75%,transparent);z-index:5}
+.brand{display:flex;align-items:center;gap:10px}
+.logo{width:38px;height:38px;border-radius:12px;background:var(--acc);color:#111;display:grid;place-items:center;font-family:'Barlow Condensed',system-ui,sans-serif;font-weight:800;font-size:20px}
+.brand b{display:block;font-family:'Barlow Condensed',system-ui,sans-serif;font-size:20px;line-height:1}
+.brand small{color:var(--mut);font-size:12px}
+.iconbtn{width:40px;height:40px;border-radius:12px;background:var(--card);display:grid;place-items:center;font-size:18px}
+.pillbal{background:var(--card);border-radius:999px;padding:7px 12px;font-weight:700;font-size:14px;display:flex;gap:6px;align-items:center}
+.pillbal span{color:var(--acc)}
+
+/* cards */
+.card{background:var(--card);border-radius:var(--r);padding:16px;margin-bottom:12px}
+.hero{background:radial-gradient(120% 140% at 100% 0%,#2d3a0a 0%,#17191F 55%);position:relative;overflow:hidden}
+.hero .big{font-family:'Barlow Condensed',system-ui,sans-serif;font-size:64px;font-weight:800;line-height:.9;color:var(--acc)}
+.hero .lbl{color:var(--mut);font-size:13px;text-transform:uppercase;letter-spacing:.08em}
+.lvl{display:flex;align-items:center;gap:8px;margin-top:12px;font-weight:700}
+.bar{height:10px;background:#0b0c0f;border-radius:99px;overflow:hidden;margin-top:8px}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--acc),#8fe000);border-radius:99px;transition:width .6s}
+.muted{color:var(--mut)} .small{font-size:13px}
+.row{display:flex;gap:10px;align-items:center}
+.between{justify-content:space-between}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px}
+.stat{background:var(--card);border-radius:14px;padding:12px;text-align:center}
+.stat b{font-family:'Barlow Condensed',system-ui,sans-serif;font-size:28px;display:block;line-height:1}
+.stat span{font-size:12px;color:var(--mut)}
+.sec{font-family:'Barlow Condensed',system-ui,sans-serif;font-size:22px;margin:20px 0 10px;display:flex;justify-content:space-between;align-items:baseline}
+.sec a{font-family:'Barlow',system-ui,sans-serif;font-size:13px;color:var(--acc);font-weight:600}
+
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px 18px;border-radius:14px;background:var(--acc);color:#111;font-weight:700;font-size:16px}
+.btn.sec2{background:var(--card2);color:var(--txt)}
+.btn.ghost{background:transparent;border:1px solid var(--line);color:var(--txt)}
+.btn.bad{background:var(--bad);color:#fff}
+.btn.ok{background:var(--ok);color:#06281a}
+.btn.sm{padding:9px 12px;font-size:14px;width:auto;border-radius:11px}
+.btn:disabled{opacity:.4}
+
+.banner{border-radius:14px;padding:12px 14px;margin-bottom:12px;font-size:14px;display:flex;gap:10px;align-items:flex-start}
+.banner.demo{background:#2a2410;color:#ffd979}
+.banner.chal{background:linear-gradient(90deg,#3a1d10,#1F2229);color:#ffc6ae}
+.banner.ro{background:#1c2733;color:#b9dfff}
+
+/* chips */
+.chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:12px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;padding:8px 14px;border-radius:999px;background:var(--card);color:var(--mut);font-weight:600;font-size:14px;border:1px solid transparent}
+.chip.on{background:var(--acc);color:#111}
+.catgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.cat{background:var(--card2);border:1px solid var(--line);border-radius:14px;padding:12px;text-align:left;font-weight:600;font-size:14px}
+.cat.on{border-color:var(--acc);background:#232b10}
+.cat em{font-style:normal;font-size:22px;display:block;margin-bottom:4px}
+
+/* idea card */
+.idea{background:var(--card);border-radius:var(--r);padding:14px 16px;margin-bottom:10px}
+.idea h3{font-size:21px;line-height:1.1;margin:6px 0 4px}
+.idea p{color:#cfd1d6;font-size:15px;white-space:pre-wrap;word-break:break-word}
+.meta{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:13px;color:var(--mut)}
+.st{font-size:12px;font-weight:700;padding:3px 9px;border-radius:99px;text-transform:uppercase;letter-spacing:.04em}
+.st.pendiente{background:#2b2f38;color:#c9ccd3}
+.st.aprobada{background:#10324a;color:var(--info)}
+.st.implementada{background:#0f3a28;color:var(--ok)}
+.st.descartada{background:#3b1520;color:var(--bad)}
+.vote{display:flex;align-items:center;gap:6px;background:var(--card2);padding:8px 12px;border-radius:12px;font-weight:700}
+.vote.on{background:#3a1d10;color:var(--acc2)}
+.vote:disabled{opacity:.5}
+.note{margin-top:10px;background:var(--card2);border-left:3px solid var(--acc);padding:8px 10px;border-radius:8px;font-size:14px;color:#d8dadf}
+.ideafoot{display:flex;justify-content:space-between;align-items:center;margin-top:12px;gap:8px}
+
+/* badges */
+.badges{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.badge{background:var(--card);border-radius:14px;padding:10px 4px;text-align:center;font-size:11px;color:var(--mut)}
+.badge em{font-style:normal;font-size:26px;display:block;filter:grayscale(1);opacity:.35}
+.badge.on{color:var(--txt)}
+.badge.on em{filter:none;opacity:1}
+
+/* rank */
+.podium{display:grid;grid-template-columns:1fr 1.15fr 1fr;gap:8px;align-items:end;margin:8px 0 14px}
+.pod{background:var(--card);border-radius:16px 16px 8px 8px;padding:12px 6px;text-align:center}
+.pod .av{width:48px;height:48px;margin:0 auto 6px;font-size:20px}
+.pod b{display:block;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pod .p{font-family:'Barlow Condensed',system-ui,sans-serif;font-size:24px;color:var(--acc)}
+.pod.n1{padding-top:20px;background:linear-gradient(#2d3a0a,var(--card))}
+.av{width:38px;height:38px;border-radius:50%;background:var(--card2);display:grid;place-items:center;font-weight:700;flex:none}
+.rrow{display:flex;align-items:center;gap:12px;padding:10px 4px;border-bottom:1px solid var(--line)}
+.rrow:last-child{border:0}
+.rrow .n{width:22px;color:var(--mut);font-weight:700;text-align:center}
+.rrow .nm{flex:1;font-weight:600;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rrow .pp{font-family:'Barlow Condensed',system-ui,sans-serif;font-size:22px}
+.rrow.me{background:#1f2a0c;border-radius:12px}
+
+/* rewards */
+.rew{display:flex;align-items:center;gap:14px;background:var(--card);border-radius:var(--r);padding:14px;margin-bottom:10px}
+.rew .em{width:54px;height:54px;border-radius:14px;background:var(--card2);display:grid;place-items:center;font-size:28px;flex:none}
+.rew .t{flex:1;min-width:0}
+.rew .t b{display:block;font-size:17px}
+.cost{font-family:'Barlow Condensed',system-ui,sans-serif;font-size:20px;color:var(--acc)}
+
+/* history */
+.hist{display:flex;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);font-size:14px}
+.hist:last-child{border:0}
+.hist .pl{font-weight:700;color:var(--ok);white-space:nowrap}
+.hist .mn{font-weight:700;color:var(--bad);white-space:nowrap}
+
+/* how */
+.how{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px dashed var(--line);font-size:15px}
+.how:last-child{border:0}
+.how b{color:var(--acc)}
+
+/* nav */
+.nav{position:fixed;left:0;right:0;bottom:0;z-index:10;background:rgba(14,15,18,.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid var(--line);padding:8px 8px calc(8px + env(safe-area-inset-bottom))}
+.nav .in{max-width:520px;margin:0 auto;display:grid;grid-template-columns:repeat(5,1fr);align-items:center}
+.nav button{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:11px;color:var(--mut);font-weight:600;padding:4px 0}
+.nav button i{font-style:normal;font-size:21px;line-height:1.1}
+.nav button.on{color:var(--acc)}
+.nav .fab{width:58px;height:58px;border-radius:18px;background:var(--acc);color:#111;font-size:30px;font-weight:700;margin:-26px auto 0;box-shadow:0 8px 24px rgba(198,244,50,.35);display:grid;place-items:center}
+
+/* modal */
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:20;display:flex;align-items:flex-end;justify-content:center;animation:fade .2s}
+.sheet{background:var(--card);width:100%;max-width:520px;border-radius:24px 24px 0 0;padding:20px 18px calc(20px + env(safe-area-inset-bottom));max-height:90vh;overflow:auto;animation:up .25s ease-out}
+.sheet h2{font-size:26px;margin-bottom:6px}
+.grab{width:40px;height:5px;background:var(--line);border-radius:9px;margin:-6px auto 14px}
+.field{margin:14px 0}
+.field label{display:block;font-size:13px;color:var(--mut);margin-bottom:6px;font-weight:600}
+.stbtns{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.stbtns button{padding:12px;border-radius:12px;background:var(--card2);font-weight:700;border:2px solid transparent;font-size:14px}
+.stbtns button.on{border-color:var(--acc)}
+@keyframes up{from{transform:translateY(40px);opacity:.4}}
+@keyframes fade{from{opacity:0}}
+
+/* toast */
+.toast{position:fixed;left:50%;top:calc(16px + env(safe-area-inset-top));transform:translateX(-50%);background:var(--acc);color:#111;font-weight:700;padding:12px 18px;border-radius:14px;z-index:30;box-shadow:0 10px 30px rgba(0,0,0,.5);animation:pop .35s cubic-bezier(.3,1.6,.6,1);max-width:90vw;text-align:center}
+.toast.err{background:var(--bad);color:#fff}
+@keyframes pop{from{transform:translateX(-50%) scale(.6);opacity:0}}
+
+.empty{text-align:center;padding:36px 16px;color:var(--mut)}
+.empty em{font-style:normal;font-size:44px;display:block;margin-bottom:8px}
+.center{min-height:80vh;display:flex;flex-direction:column;justify-content:center}
+.seg{display:flex;background:var(--card);border-radius:12px;padding:4px;margin-bottom:12px}
+.seg button{flex:1;padding:9px;border-radius:9px;font-weight:600;font-size:14px;color:var(--mut)}
+.seg button.on{background:var(--card2);color:var(--txt)}
+.adm-tabs{display:flex;gap:6px;overflow-x:auto;margin-bottom:12px;scrollbar-width:none}
+.adm-tabs::-webkit-scrollbar{display:none}
+.kpi{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.kpi .stat{text-align:left;padding:14px}
+.kpi .stat b{font-size:32px}
+.rewedit{display:grid;grid-template-columns:52px 1fr 80px 36px;gap:6px;margin-bottom:8px;align-items:center}
+.rewedit input{padding:10px 8px}
+.x{width:36px;height:36px;border-radius:10px;background:var(--card2);color:var(--bad);font-weight:700}
+.spin{width:36px;height:36px;border:4px solid var(--line);border-top-color:var(--acc);border-radius:50%;animation:sp 0.8s linear infinite;margin:0 auto 14px}
+@keyframes sp{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<div id="modal"></div>
+<div id="toast"></div>
+<script>
+(() => {
+/* ================== CONFIGURACIÓN POR DEFECTO ================== */
+const CATS = [
+  {id:'ingresos', em:'💰', name:'Nuevos servicios / ingresos'},
+  {id:'entreno',  em:'🏋️', name:'Entrenamientos y clases'},
+  {id:'instal',   em:'🛠️', name:'Instalaciones y material'},
+  {id:'marketing',em:'📣', name:'Marketing y captación'},
+  {id:'atencion', em:'🤝', name:'Atención al socio'},
+  {id:'otro',     em:'✨', name:'Otra idea'}
+];
+const IMPACT = [
+  {v:0, t:'No lo sé'}, {v:50, t:'Menos de 100 €/mes'}, {v:300, t:'100 – 500 €/mes'},
+  {v:750, t:'500 – 1.000 €/mes'}, {v:1500, t:'Más de 1.000 €/mes'}
+];
+const DEFAULT_RULES = {submit:10, approve:50, implement:150, voteReceived:2, voteGiven:1};
+const DEFAULT_REWARDS = [
+  {id:'r1', em:'🥤', name:'Batido de proteínas', cost:100},
+  {id:'r2', em:'👕', name:'Camiseta del centro', cost:250},
+  {id:'r3', em:'💪', name:'Sesión 1:1 extra', cost:350},
+  {id:'r4', em:'🏷️', name:'10% dto. en tu cuota', cost:500},
+  {id:'r5', em:'🏆', name:'Un mes gratis', cost:1200}
+];
+const LEVELS = [
+  {min:0,    name:'Bronce',  em:'🥉'},
+  {min:150,  name:'Plata',   em:'🥈'},
+  {min:400,  name:'Oro',     em:'🥇'},
+  {min:800,  name:'Platino', em:'💎'},
+  {min:1500, name:'Leyenda', em:'👑'}
+];
+const BADGES = [
+  {id:'primera', em:'💡', name:'Primera idea', test:s=>s.ideas>=1},
+  {id:'cinco',   em:'🔥', name:'5 ideas',      test:s=>s.ideas>=5},
+  {id:'diez',    em:'🚀', name:'10 ideas',     test:s=>s.ideas>=10},
+  {id:'aprob',   em:'✅', name:'Aprobada',     test:s=>s.approved>=1},
+  {id:'impl',    em:'🛠️', name:'Hecha realidad',test:s=>s.implemented>=1},
+  {id:'dinero',  em:'💰', name:'Genera ingresos',test:s=>s.moneyImpl>=1},
+  {id:'popular', em:'⭐', name:'Popular (10 votos)',test:s=>s.maxVotes>=10},
+  {id:'votante', em:'🗳️', name:'Votante (10)', test:s=>s.votesGiven>=10}
+];
+const STATUS_LBL = {pendiente:'Pendiente', aprobada:'Aprobada', implementada:'Implementada', descartada:'Descartada'};
+
+/* ================== ESTADO ================== */
+const S = {
+  phase:'loading', mode:null, me:null, isAdmin:false, canWrite:true, demoRole:'socio',
+  members:{}, suggestions:{}, reviews:{}, votes:{}, redemptions:{}, deliveries:{}, config:{},
+  view:'inicio', ideaFilter:'todas', ideaSort:'recientes', rankMode:'mes', admTab:'revisar',
+  draft:{title:'', text:'', cat:'', impact:0}, modal:null, stale:false, loadNote:''
+};
+const COLLS = ['members','suggestions','reviews','votes','redemptions','deliveries','config'];
+
+/* ================== UTILIDADES ================== */
+const $ = s => document.querySelector(s);
+const esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,8);
+const cat = id => CATS.find(c=>c.id===id) || CATS[5];
+const initials = n => (String(n||'?').trim().split(/\s+/).map(w=>w[0]).join('').slice(0,2) || '?').toUpperCase();
+const fmtDate = t => { if(!t) return ''; const d=new Date(t), now=Date.now(), diff=(now-t)/864e5;
+  if(diff<1 && new Date(now).getDate()===d.getDate()) return 'hoy';
+  if(diff<2) return 'ayer'; if(diff<7) return `hace ${Math.floor(diff)} días`;
+  return d.toLocaleDateString('es-ES',{day:'numeric',month:'short'}); };
+const eur = n => (n||0).toLocaleString('es-ES') + ' €';
+const rules = () => ({...DEFAULT_RULES, ...(S.config.main?.rules||{})});
+const rewards = () => (S.config.main?.rewards && S.config.main.rewards.length) ? S.config.main.rewards : DEFAULT_REWARDS;
+const centerName = () => S.config.main?.centerName || 'Tu Centro';
+const challenge = () => S.config.main?.challenge || null; // {cat, mult}
+const alias = id => S.members[id]?.alias || 'Socio';
+const isAdmin = () => S.mode==='demo' ? S.demoRole==='admin' : S.isAdmin;
+
+function toast(msg, err){ const t=$('#toast'); t.innerHTML=`<div class="toast ${err?'err':''}">${esc(msg)}</div>`; clearTimeout(toast._t); toast._t=setTimeout(()=>t.innerHTML='',2600); }
+
+/* ================== ALMACENAMIENTO ==================
+   Modo "live": base de datos compartida del artefacto (todos ven lo mismo).
+   Modo "demo": datos guardados solo en este navegador, para probar.        */
+let store = null;
+
+function makeDbStore(db){
+  return {
+    watch(coll, cb, onErr){ return db.collection(coll).onSnapshot(snap=>{ const m={}; snap.docs.forEach(d=>{ if(d.exists) m[d.id]=d.data(); }); cb(m, snap.metadata); }, onErr); },
+    set:(coll,id,data)=>db.collection(coll).doc(id).set(data),
+    del:(coll,id)=>db.collection(coll).doc(id).delete()
+  };
+}
+function makeDemoStore(){
+  const KEY='ideas_que_suman_demo_v1'; let data=null; const subs={};
+  try{ data=JSON.parse(localStorage.getItem(KEY)||'null'); }catch(e){}
+  if(!data){ data=demoSeed(); }
+  const save=()=>{ try{ localStorage.setItem(KEY, JSON.stringify(data)); }catch(e){} };
+  const emit=c=>(subs[c]||[]).forEach(cb=>cb({...data[c]},{fromCache:false}));
+  save();
+  return {
+    watch(c,cb){ data[c]=data[c]||{}; (subs[c]=subs[c]||[]).push(cb); setTimeout(()=>cb({...data[c]},{fromCache:false}),0); return ()=>{}; },
+    async set(c,id,v){ data[c]=data[c]||{}; data[c][id]=JSON.parse(JSON.stringify(v)); save(); emit(c); },
+    async del(c,id){ if(data[c]) delete data[c][id]; save(); emit(c); },
+    reset(){ data=demoSeed(); save(); COLLS.forEach(emit); }
+  };
+}
+function demoSeed(){
+  const d=864e5, n=Date.now();
+  const members={ 'demo-yo':{alias:'Tú (demo)',joinedAt:n-20*d}, m1:{alias:'Laura G.',joinedAt:n-60*d}, m2:{alias:'Carlos M.',joinedAt:n-50*d}, m3:{alias:'Marta R.',joinedAt:n-40*d}, m4:{alias:'Javi P.',joinedAt:n-30*d} };
+  const suggestions={
+    s1:{authorId:'m1',title:'Bonos de 5 sesiones para parejas',text:'Muchos venimos en pareja. Un bono compartido con algo de descuento animaría a traer a la pareja y entraría más dinero.',cat:'ingresos',impact:750,createdAt:n-12*d},
+    s2:{authorId:'m2',title:'Clase de movilidad los sábados',text:'Una clase corta de movilidad el sábado por la mañana. Mucha gente la pagaría aparte.',cat:'entreno',impact:300,createdAt:n-9*d},
+    s3:{authorId:'m3',title:'Programa "Trae a un amigo"',text:'Si un socio trae a alguien que se apunta, los dos ganan una semana gratis.',cat:'marketing',impact:1500,createdAt:n-6*d},
+    s4:{authorId:'m4',title:'Más discos de 5 kg',text:'En hora punta faltan discos pequeños.',cat:'instal',impact:0,createdAt:n-3*d},
+    s5:{authorId:'demo-yo',title:'Recordatorio de sesión por WhatsApp',text:'Un mensaje el día antes reduciría las faltas sin avisar.',cat:'atencion',impact:300,createdAt:n-2*d},
+    s6:{authorId:'m1',title:'Vender snacks saludables en recepción',text:'Barritas y bebidas después de entrenar.',cat:'ingresos',impact:300,createdAt:n-1*d}
+  };
+  const reviews={
+    s1:{status:'implementada',at:n-10*d,implAt:n-5*d,bonus:100,note:'¡Ya está a la venta! Gracias Laura 🙌',mult:1},
+    s2:{status:'aprobada',at:n-7*d,note:'Empezamos el mes que viene.',mult:1},
+    s3:{status:'aprobada',at:n-4*d,note:'',mult:1}
+  };
+  const votes={}; const add=(sid,u,ago)=>votes[sid+'__'+u]={sid,uid:u,at:n-ago*d};
+  ['m2','m3','m4','demo-yo'].forEach((u,i)=>add('s1',u,11-i)); ['m1','m3'].forEach((u,i)=>add('s2',u,8-i));
+  ['m1','m2','m4'].forEach((u,i)=>add('s3',u,5-i)); add('s5','m2',1); add('s6','m3',0.5);
+  return {members,suggestions,reviews,votes,redemptions:{rd1:{uid:'m1',rewardId:'r1',name:'Batido de proteínas',em:'🥤',cost:100,at:n-4*d}},deliveries:{rd1:{status:'entregado',at:n-3*d}},config:{}};
+}
+
+/* ================== PUNTOS ================== */
+function compute(){
+  const R=rules(), ev={}, st={};
+  const push=(u,pts,at,label)=>{ if(!u) return; (ev[u]=ev[u]||[]).push({pts,at:at||0,label}); };
+  const S0=()=>({ideas:0,approved:0,implemented:0,moneyImpl:0,maxVotes:0,votesGiven:0});
+  const stat=u=>st[u]=st[u]||S0();
+  const vBy={}; Object.values(S.votes).forEach(v=>{ (vBy[v.sid]=vBy[v.sid]||[]).push(v); });
+  for(const [sid,s] of Object.entries(S.suggestions)){
+    const rv=S.reviews[sid]||{}, status=rv.status||'pendiente';
+    if(status==='descartada') continue;
+    const a=s.authorId, x=stat(a), m=rv.mult||1;
+    x.ideas++;
+    push(a,R.submit,s.createdAt,`Idea enviada · ${s.title}`);
+    if(status==='aprobada'||status==='implementada'){ x.approved++; push(a,Math.round(R.approve*m),rv.at,`Idea aprobada${m>1?' (x'+m+')':''} · ${s.title}`); }
+    if(status==='implementada'){ x.implemented++; if(s.cat==='ingresos') x.moneyImpl++; push(a,Math.round(R.implement*m),rv.implAt||rv.at,`Idea implementada · ${s.title}`); }
+    if(rv.bonus) push(a,+rv.bonus,rv.implAt||rv.at,`Bonus por impacto · ${s.title}`);
+    const vs=(vBy[sid]||[]).filter(v=>v.uid!==a);
+    x.maxVotes=Math.max(x.maxVotes,vs.length);
+    vs.forEach(v=>push(a,R.voteReceived,v.at,`Voto recibido · ${s.title}`));
+  }
+  Object.values(S.votes).forEach(v=>{ const s=S.suggestions[v.sid]; if(!s||s.authorId===v.uid) return; if((S.reviews[v.sid]?.status)==='descartada') return; stat(v.uid).votesGiven++; push(v.uid,R.voteGiven,v.at,`Has votado · ${s.title}`); });
+  Object.entries(S.redemptions).forEach(([rid,r])=>{ if(S.deliveries[rid]?.status==='rechazado') return; push(r.uid,-r.cost,r.at,`Canje · ${r.name}`); });
+  const mStart=new Date(); mStart.setDate(1); mStart.setHours(0,0,0,0);
+  const out={};
+  const ids=new Set([...Object.keys(S.members),...Object.keys(ev)]);
+  ids.forEach(u=>{ const e=(ev[u]||[]).sort((a,b)=>b.at-a.at);
+    const earned=e.filter(x=>x.pts>0).reduce((t,x)=>t+x.pts,0);
+    const month=e.filter(x=>x.pts>0&&x.at>=mStart.getTime()).reduce((t,x)=>t+x.pts,0);
+    const balance=e.reduce((t,x)=>t+x.pts,0);
+    out[u]={events:e,earned,month,balance,stats:st[u]||S0()}; });
+  return out;
+}
+function levelOf(p){ let i=0; LEVELS.forEach((l,k)=>{ if(p>=l.min) i=k; }); const cur=LEVELS[i], nx=LEVELS[i+1]; return {cur,nx,pct:nx?Math.min(100,Math.round((p-cur.min)/(nx.min-cur.min)*100)):100}; }
+
+/* ================== RENDER ================== */
+const FORM_VIEWS=new Set(['nueva','admin:premios','admin:ajustes']);
+function viewKey(){ return S.view==='admin' ? 'admin:'+S.admTab : S.view; }
+function scheduleRender(){ if(S.modal || FORM_VIEWS.has(viewKey())){ S.stale=true; return; } render(); }
+
+function render(){
+  S.stale=false;
+  const root=$('#root');
+  if(S.phase==='loading'){ root.innerHTML=`<div class="app center"><div class="spin"></div><p class="muted" style="text-align:center">Cargando…${S.loadNote?'<br><small>'+esc(S.loadNote)+'</small>':''}</p></div>`; return; }
+  if(S.phase==='onboard'){ root.innerHTML=onboard(); bindOnboard(); return; }
+  const P=compute(), me=P[S.me]||{events:[],earned:0,month:0,balance:0,stats:{}};
+  let body='';
+  if(S.view==='inicio') body=vInicio(P,me);
+  else if(S.view==='ideas') body=vIdeas(P);
+  else if(S.view==='nueva') body=vNueva();
+  else if(S.view==='ranking') body=vRanking(P);
+  else if(S.view==='premios') body=vPremios(me);
+  else if(S.view==='admin') body=isAdmin()?vAdmin(P):vInicio(P,me);
+  root.innerHTML=`<div class="app">${header(me)}${banners()}${body}</div>${nav()}`;
+  bind();
+}
+
+function header(me){
+  return `<div class="top">
+    <div class="brand"><div class="logo">${esc(initials(centerName()))}</div><div><b>${esc(centerName())}</b><small>Ideas que suman</small></div></div>
+    <div class="row">
+      <div class="pillbal">⚡ <span>${me.balance}</span></div>
+      ${isAdmin()?`<button class="iconbtn" data-go="admin" aria-label="Panel de administración">⚙️</button>`:''}
+      <button class="iconbtn" data-act="perfil" aria-label="Mi perfil">👤</button>
+    </div></div>`;
+}
+function banners(){
+  let h='';
+  if(S.mode==='demo') h+=`<div class="banner demo">🧪 <div><b>Modo demo</b> · datos de ejemplo guardados solo en este móvil. Viendo como <b>${S.demoRole==='admin'?'Administrador':'Socio'}</b>. <a href="#" data-act="role" style="color:inherit;text-decoration:underline">Cambiar</a></div></div>`;
+  if(!S.canWrite) h+=`<div class="banner ro">👀 Tienes acceso solo de lectura. Pide al centro acceso para enviar ideas.</div>`;
+  const ch=challenge();
+  if(ch && ch.cat && S.view!=='admin') h+=`<div class="banner chal">🎯 <div><b>Reto activo:</b> las ideas de <b>${esc(cat(ch.cat).em+' '+cat(ch.cat).name)}</b> valen <b>x${esc(ch.mult)}</b> puntos al aprobarse.</div></div>`;
+  return h;
+}
+function nav(){
+  const b=(v,i,t)=>`<button class="${S.view===v?'on':''}" data-go="${v}"><i>${i}</i>${t}</button>`;
+  return `<nav class="nav"><div class="in">${b('inicio','🏠','Inicio')}${b('ideas','💡','Ideas')}
+    <button data-go="nueva" aria-label="Nueva idea"><div class="fab">+</div></button>
+    ${b('ranking','🏆','Ranking')}${b('premios','🎁','Premios')}</div></nav>`;
+}
+
+function vInicio(P,me){
+  const L=levelOf(me.earned), R=rules();
+  const ranked=Object.entries(P).filter(([u])=>S.members[u]).sort((a,b)=>b[1].month-a[1].month);
+  const pos=ranked.findIndex(([u])=>u===S.me)+1;
+  const s=me.stats||{};
+  const hist=me.events.slice(0,6);
+  return `
+  <div class="card hero">
+    <div class="lbl">Tus puntos disponibles</div>
+    <div class="big">${me.balance}</div>
+    <div class="lvl">${L.cur.em} Nivel ${esc(L.cur.name)} <span class="muted small" style="margin-left:auto">${me.earned} pts totales</span></div>
+    <div class="bar"><i style="width:${L.pct}%"></i></div>
+    <div class="small muted" style="margin-top:6px">${L.nx?`Te faltan <b style="color:var(--txt)">${L.nx.min-me.earned} pts</b> para ${L.nx.em} ${esc(L.nx.name)}`:'¡Has llegado al nivel máximo! 👑'}</div>
+  </div>
+  <div class="grid3">
+    <div class="stat"><b>${pos?('#'+pos):'–'}</b><span>Ranking mes</span></div>
+    <div class="stat"><b>${s.ideas||0}</b><span>Ideas</span></div>
+    <div class="stat"><b>${s.implemented||0}</b><span>Implantadas</span></div>
+  </div>
+  <button class="btn" data-go="nueva">💡 Enviar una idea</button>
+  <div class="sec">Insignias</div>
+  <div class="badges">${BADGES.map(b=>`<div class="badge ${b.test(s)?'on':''}"><em>${b.em}</em>${esc(b.name)}</div>`).join('')}</div>
+  <div class="sec">Cómo ganar puntos</div>
+  <div class="card">
+    <div class="how"><span>💡 Envías una idea</span><b>+${R.submit}</b></div>
+    <div class="how"><span>✅ El centro la aprueba</span><b>+${R.approve}</b></div>
+    <div class="how"><span>🛠️ Se pone en marcha</span><b>+${R.implement}</b></div>
+    <div class="how"><span>💰 Bonus si genera ingresos</span><b>extra</b></div>
+    <div class="how"><span>🔥 Cada voto que recibe tu idea</span><b>+${R.voteReceived}</b></div>
+    <div class="how"><span>🗳️ Votas ideas de otros</span><b>+${R.voteGiven}</b></div>
+  </div>
+  <div class="sec">Últimos movimientos ${me.events.length>6?'<a href="#" data-act="hist">Ver todo</a>':''}</div>
+  <div class="card">${hist.length?hist.map(histRow).join(''):`<div class="empty" style="padding:16px"><em>🌱</em>Aún no tienes puntos. ¡Envía tu primera idea!</div>`}</div>`;
+}
+const histRow=e=>`<div class="hist"><div><div>${esc(e.label)}</div><div class="muted small">${fmtDate(e.at)}</div></div><div class="${e.pts>=0?'pl':'mn'}">${e.pts>=0?'+':''}${e.pts}</div></div>`;
+
+function ideaList(){
+  const adm=isAdmin();
+  let list=Object.entries(S.suggestions).map(([id,s])=>({id,...s,status:S.reviews[id]?.status||'pendiente',rv:S.reviews[id]||{},votes:Object.values(S.votes).filter(v=>v.sid===id&&v.uid!==s.authorId).length}));
+  list=list.filter(i=>i.status!=='descartada'||adm||i.authorId===S.me);
+  return list;
+}
+function vIdeas(){
+  let list=ideaList();
+  const f=S.ideaFilter;
+  if(f==='mias') list=list.filter(i=>i.authorId===S.me);
+  else if(f!=='todas') list=list.filter(i=>i.status===f);
+  list.sort(S.ideaSort==='votadas'?(a,b)=>b.votes-a.votes||b.createdAt-a.createdAt:(a,b)=>b.createdAt-a.createdAt);
+  const ch=(k,t)=>`<button class="chip ${f===k?'on':''}" data-filter="${k}">${t}</button>`;
+  return `<h1 style="font-size:34px;margin:4px 0 12px">Ideas del centro</h1>
+  <div class="chips">${ch('todas','Todas')}${ch('mias','Mis ideas')}${ch('pendiente','Pendientes')}${ch('aprobada','Aprobadas')}${ch('implementada','Implantadas')}</div>
+  <div class="seg"><button class="${S.ideaSort==='recientes'?'on':''}" data-sort="recientes">Más recientes</button><button class="${S.ideaSort==='votadas'?'on':''}" data-sort="votadas">Más votadas</button></div>
+  ${list.length?list.map(ideaCard).join(''):`<div class="empty"><em>💭</em>No hay ideas aquí todavía.<br><br><button class="btn sm" data-go="nueva">Envía la primera</button></div>`}`;
+}
+function ideaCard(i){
+  const c=cat(i.cat), mine=i.authorId===S.me, voted=!!S.votes[i.id+'__'+S.me];
+  return `<div class="idea">
+    <div class="meta"><span>${c.em} ${esc(c.name)}</span><span class="st ${i.status}">${STATUS_LBL[i.status]}</span></div>
+    <h3>${esc(i.title)}</h3>
+    <p>${esc(i.text)}</p>
+    ${i.rv.note?`<div class="note"><b>${esc(centerName())}:</b> ${esc(i.rv.note)}</div>`:''}
+    <div class="ideafoot">
+      <div class="meta"><div class="av" style="width:28px;height:28px;font-size:12px">${esc(initials(alias(i.authorId)))}</div>${esc(mine?'Tú':alias(i.authorId))} · ${fmtDate(i.createdAt)}</div>
+      <div class="row">
+        ${isAdmin()?`<button class="btn sm sec2" data-review="${i.id}">Revisar</button>`:''}
+        <button class="vote ${voted?'on':''}" data-vote="${i.id}" ${mine||!S.canWrite||i.status==='descartada'?'disabled':''} aria-label="Votar">🔥 ${i.votes}</button>
+      </div>
+    </div></div>`;
+}
+
+function vNueva(){
+  const d=S.draft, R=rules(), ch=challenge();
+  return `<h1 style="font-size:34px;margin:4px 0 4px">Nueva idea</h1>
+  <p class="muted" style="margin-bottom:8px">¿Qué mejorarías del centro? Las ideas que ayudan a crecer y facturar más son las que más puntos dan.</p>
+  <div class="field"><label>Título corto *</label><input id="f-title" maxlength="80" placeholder="Ej.: Clase de HIIT a la hora de comer" value="${esc(d.title)}"></div>
+  <div class="field"><label>Cuéntanos la idea *</label><textarea id="f-text" maxlength="1200" placeholder="¿Qué propones? ¿Por qué crees que funcionaría?">${esc(d.text)}</textarea></div>
+  <div class="field"><label>Categoría *</label><div class="catgrid">${CATS.map(c=>`<button class="cat ${d.cat===c.id?'on':''}" data-cat="${c.id}"><em>${c.em}</em>${esc(c.name)}${ch&&ch.cat===c.id?' <span style="color:var(--acc2)">· x'+esc(ch.mult)+'</span>':''}</button>`).join('')}</div></div>
+  <div class="field"><label>¿Cuánto crees que podría facturar el centro con esto?</label>
+    <select id="f-impact">${IMPACT.map(o=>`<option value="${o.v}" ${+d.impact===o.v?'selected':''}>${o.t}</option>`).join('')}</select></div>
+  <button class="btn" data-act="enviar" ${S.canWrite?'':'disabled'}>Enviar idea · +${R.submit} pts</button>
+  <p class="muted small" style="text-align:center;margin-top:10px">El equipo del centro la revisará. Si se aprueba ganas +${R.approve} y si se implanta +${R.implement} más.</p>`;
+}
+
+function vRanking(P){
+  const key=S.rankMode==='mes'?'month':'earned';
+  const arr=Object.entries(P).filter(([u])=>S.members[u]).map(([u,p])=>({u,pts:p[key],L:levelOf(p.earned)})).sort((a,b)=>b.pts-a.pts);
+  const top=arr.slice(0,3);
+  const pod=(x,n)=>x?`<div class="pod n${n}"><div style="font-size:22px">${['','🥇','🥈','🥉'][n]}</div><div class="av">${esc(initials(alias(x.u)))}</div><b>${esc(x.u===S.me?'Tú':alias(x.u))}</b><div class="p">${x.pts}</div></div>`:'<div></div>';
+  const month=new Date().toLocaleDateString('es-ES',{month:'long'});
+  return `<h1 style="font-size:34px;margin:4px 0 12px">Ranking</h1>
+  <div class="seg"><button class="${S.rankMode==='mes'?'on':''}" data-rank="mes">Este mes (${esc(month)})</button><button class="${S.rankMode==='total'?'on':''}" data-rank="total">Histórico</button></div>
+  ${arr.length?`<div class="podium">${pod(top[1],2)}${pod(top[0],1)}${pod(top[2],3)}</div>
+  <div class="card">${arr.map((x,i)=>`<div class="rrow ${x.u===S.me?'me':''}"><div class="n">${i+1}</div><div class="av">${esc(initials(alias(x.u)))}</div><div class="nm">${esc(x.u===S.me?'Tú':alias(x.u))}<div class="muted small">${x.L.cur.em} ${esc(x.L.cur.name)}</div></div><div class="pp">${x.pts}</div></div>`).join('')}</div>`
+  :`<div class="empty"><em>🏁</em>Aún no hay nadie en el ranking.</div>`}`;
+}
+
+function vPremios(me){
+  const mine=Object.entries(S.redemptions).filter(([,r])=>r.uid===S.me).sort((a,b)=>b[1].at-a[1].at);
+  return `<h1 style="font-size:34px;margin:4px 0 4px">Premios</h1>
+  <p class="muted" style="margin-bottom:14px">Tienes <b style="color:var(--acc)">${me.balance} pts</b> para canjear.</p>
+  ${rewards().map(r=>{ const ok=me.balance>=r.cost; return `<div class="rew"><div class="em">${esc(r.em||'🎁')}</div><div class="t"><b>${esc(r.name)}</b><span class="cost">${r.cost} pts</span>${!ok?`<div class="muted small">Te faltan ${r.cost-me.balance}</div>`:''}</div><button class="btn sm" data-redeem="${esc(r.id)}" ${ok&&S.canWrite?'':'disabled'}>Canjear</button></div>`; }).join('')}
+  <div class="sec">Mis canjes</div>
+  <div class="card">${mine.length?mine.map(([id,r])=>{ const d=S.deliveries[id]; const st=d?.status==='entregado'?'<span class="st implementada">Entregado</span>':d?.status==='rechazado'?'<span class="st descartada">Rechazado · devuelto</span>':'<span class="st pendiente">Pendiente</span>';
+    return `<div class="hist"><div>${esc(r.em||'🎁')} ${esc(r.name)}<div class="muted small">${fmtDate(r.at)} · ${r.cost} pts</div></div><div>${st}</div></div>`; }).join(''):`<div class="muted small" style="padding:6px 0">Todavía no has canjeado nada. Pide tu premio en recepción cuando lo canjees.</div>`}</div>`;
+}
+
+/* ---------- ADMIN ---------- */
+function vAdmin(P){
+  const t=S.admTab, ch=(k,txt,n)=>`<button class="chip ${t===k?'on':''}" data-adm="${k}">${txt}${n?` (${n})`:''}</button>`;
+  const pend=ideaList().filter(i=>i.status==='pendiente');
+  const pendR=Object.keys(S.redemptions).filter(id=>!S.deliveries[id]);
+  let body='';
+  if(t==='revisar') body=pend.length?pend.sort((a,b)=>a.createdAt-b.createdAt).map(ideaCard).join(''):`<div class="empty"><em>🎉</em>No hay ideas pendientes de revisar.</div>`;
+  if(t==='canjes') body=pendR.length?pendR.map(id=>{ const r=S.redemptions[id]; return `<div class="rew"><div class="em">${esc(r.em||'🎁')}</div><div class="t"><b>${esc(r.name)}</b><span class="muted small">${esc(alias(r.uid))} · ${fmtDate(r.at)} · ${r.cost} pts</span></div><div class="row" style="flex-direction:column;gap:6px"><button class="btn sm ok" data-deliv="${id}" data-s="entregado">Entregado</button><button class="btn sm ghost" data-deliv="${id}" data-s="rechazado">Rechazar</button></div></div>`; }).join(''):`<div class="empty"><em>📦</em>No hay canjes pendientes de entregar.</div>`;
+  if(t==='resumen') body=vResumen(P);
+  if(t==='premios') body=vAdmRewards();
+  if(t==='ajustes') body=vAdmSettings();
+  return `<div class="row between" style="margin:4px 0 12px"><h1 style="font-size:32px">Panel del centro</h1><button class="btn sm sec2" data-go="inicio">Cerrar</button></div>
+  <div class="adm-tabs">${ch('revisar','Revisar',pend.length)}${ch('canjes','Canjes',pendR.length)}${ch('resumen','Resumen')}${ch('premios','Premios')}${ch('ajustes','Ajustes')}</div>${body}`;
+}
+function vResumen(P){
+  const all=Object.entries(S.suggestions).map(([id,s])=>({...s,id,status:S.reviews[id]?.status||'pendiente',rv:S.reviews[id]||{}}));
+  const cnt=st=>all.filter(i=>i.status===st).length;
+  const val=i=>(i.rv.value!=null&&i.rv.value!=='')?+i.rv.value:(+i.impact||0);
+  const implVal=all.filter(i=>i.status==='implementada').reduce((t,i)=>t+val(i),0);
+  const apprVal=all.filter(i=>i.status==='aprobada').reduce((t,i)=>t+val(i),0);
+  const m30=Date.now()-30*864e5;
+  const active=new Set([...all.filter(i=>i.createdAt>m30).map(i=>i.authorId),...Object.values(S.votes).filter(v=>v.at>m30).map(v=>v.uid)]).size;
+  const byCat=CATS.map(c=>({c,n:all.filter(i=>i.cat===c.id).length})).sort((a,b)=>b.n-a.n);
+  const maxN=Math.max(1,...byCat.map(x=>x.n));
+  const ptsOut=Object.values(P).reduce((t,p)=>t+p.earned,0);
+  return `<div class="kpi">
+    <div class="stat"><span>Ideas recibidas</span><b>${all.length}</b></div>
+    <div class="stat"><span>Socios activos (30 d)</span><b>${active}</b></div>
+    <div class="stat"><span>Implantadas</span><b style="color:var(--ok)">${cnt('implementada')}</b></div>
+    <div class="stat"><span>Pendientes</span><b>${cnt('pendiente')}</b></div>
+  </div>
+  <div class="card hero"><div class="lbl">Ingresos estimados de ideas implantadas</div><div class="big" style="font-size:46px">${eur(implVal)}<span style="font-size:20px;color:var(--mut)">/mes</span></div>
+  <div class="small muted" style="margin-top:6px">+ ${eur(apprVal)}/mes en ideas aprobadas aún por implantar. Estimación de los socios, salvo que tú pongas el valor real al revisar.</div></div>
+  <div class="sec">Ideas por categoría</div>
+  <div class="card">${byCat.map(x=>`<div style="margin:8px 0"><div class="row between small"><span>${x.c.em} ${esc(x.c.name)}</span><b>${x.n}</b></div><div class="bar" style="height:8px;margin-top:4px"><i style="width:${x.n/maxN*100}%"></i></div></div>`).join('')}</div>
+  <div class="card small muted">Puntos repartidos en total: <b style="color:var(--txt)">${ptsOut}</b> · Socios registrados: <b style="color:var(--txt)">${Object.keys(S.members).length}</b></div>`;
+}
+function vAdmRewards(){
+  const list=(S.admRewardsDraft=S.admRewardsDraft||JSON.parse(JSON.stringify(rewards())));
+  return `<p class="muted small" style="margin-bottom:10px">Edita el catálogo de premios: emoji, nombre y coste en puntos.</p>
+  <div id="rew-list">${list.map((r,i)=>`<div class="rewedit"><input data-rw="${i}" data-k="em" value="${esc(r.em)}" maxlength="4"><input data-rw="${i}" data-k="name" value="${esc(r.name)}" placeholder="Nombre del premio"><input data-rw="${i}" data-k="cost" type="number" min="1" value="${esc(r.cost)}"><button class="x" data-rwdel="${i}" aria-label="Quitar">✕</button></div>`).join('')}</div>
+  <button class="btn ghost" data-act="rwadd" style="margin:8px 0">+ Añadir premio</button>
+  <button class="btn" data-act="rwsave">Guardar premios</button>`;
+}
+function vAdmSettings(){
+  const R=rules(), ch=challenge()||{cat:'',mult:2};
+  const num=(k,t)=>`<div class="field"><label>${t}</label><input type="number" min="0" id="rl-${k}" value="${R[k]}"></div>`;
+  return `<div class="card">
+    <div class="field" style="margin-top:0"><label>Nombre del centro</label><input id="cfg-name" value="${esc(S.config.main?.centerName||'')}" placeholder="Ej.: Pablo Training Studio"></div>
+  </div>
+  <div class="sec">Puntos por acción</div>
+  <div class="card">${num('submit','Enviar una idea')}${num('approve','Idea aprobada')}${num('implement','Idea implantada')}${num('voteReceived','Cada voto recibido')}${num('voteGiven','Cada voto dado')}</div>
+  <div class="sec">Reto del mes</div>
+  <div class="card"><p class="muted small">Multiplica los puntos de aprobación e implantación de una categoría para empujar el tipo de ideas que más necesitas.</p>
+    <div class="field"><label>Categoría destacada</label><select id="ch-cat"><option value="">Sin reto activo</option>${CATS.map(c=>`<option value="${c.id}" ${ch.cat===c.id?'selected':''}>${c.em} ${esc(c.name)}</option>`).join('')}</select></div>
+    <div class="field"><label>Multiplicador</label><select id="ch-mult">${[1.5,2,3].map(m=>`<option value="${m}" ${+ch.mult===m?'selected':''}>x${m}</option>`).join('')}</select></div>
+  </div>
+  <button class="btn" data-act="cfgsave">Guardar ajustes</button>
+  ${S.mode==='demo'?`<button class="btn ghost" data-act="demoreset" style="margin-top:10px">Restablecer datos de ejemplo</button>`:''}`;
+}
+
+/* ---------- MODALES ---------- */
+function openModal(m){ S.modal=m; renderModal(); }
+function closeModal(){ S.modal=null; $('#modal').innerHTML=''; if(S.stale) render(); }
+function renderModal(){
+  const m=S.modal, el=$('#modal'); if(!m){ el.innerHTML=''; return; }
+  let h='';
+  if(m.type==='review'){
+    const s=S.suggestions[m.id], rv=S.reviews[m.id]||{};
+    m.status=m.status||rv.status||'pendiente';
+    const b=(k,t)=>`<button class="${m.status===k?'on':''}" data-mst="${k}">${t}</button>`;
+    h=`<h2>Revisar idea</h2><p class="muted small">${esc(alias(s.authorId))} · ${cat(s.cat).em} ${esc(cat(s.cat).name)} · estimación: ${esc((IMPACT.find(o=>o.v===+s.impact)||IMPACT[0]).t)}</p>
+    <div class="card" style="background:var(--card2);margin-top:10px"><b>${esc(s.title)}</b><p class="small" style="margin-top:4px;white-space:pre-wrap">${esc(s.text)}</p></div>
+    <div class="field"><label>Estado</label><div class="stbtns">${b('pendiente','⏳ Pendiente')}${b('aprobada','✅ Aprobar')}${b('implementada','🛠️ Implantada')}${b('descartada','🚫 Descartar')}</div></div>
+    <div class="field"><label>Bonus extra de puntos (si genera ingresos o tiene mucho impacto)</label><input id="m-bonus" type="number" min="0" value="${esc(rv.bonus||'')}" placeholder="0"></div>
+    <div class="field"><label>Ingreso real estimado para el centro (€/mes, opcional)</label><input id="m-value" type="number" min="0" value="${esc(rv.value??'')}" placeholder="Si lo sabes, mejora el resumen"></div>
+    <div class="field"><label>Mensaje para el socio (lo verá todo el mundo)</label><textarea id="m-note" style="min-height:80px" placeholder="¡Gracias! La ponemos en marcha en enero.">${esc(rv.note||'')}</textarea></div>
+    <div class="row"><button class="btn ghost" data-act="mclose">Cancelar</button><button class="btn" data-act="msave">Guardar</button></div>
+    <button class="btn bad" data-act="mdelete" style="margin-top:10px;background:transparent;color:var(--bad);border:1px solid #4a1d28">Eliminar idea</button>`;
+  }
+  if(m.type==='redeem'){
+    const r=rewards().find(x=>x.id===m.id);
+    h=`<div style="text-align:center;font-size:56px">${esc(r.em||'🎁')}</div><h2 style="text-align:center">${esc(r.name)}</h2>
+    <p class="muted" style="text-align:center;margin-bottom:16px">Se descontarán <b style="color:var(--acc)">${r.cost} pts</b>. Recógelo en recepción: el centro lo marcará como entregado.</p>
+    <div class="row"><button class="btn ghost" data-act="mclose">Cancelar</button><button class="btn" data-act="mredeem">Confirmar canje</button></div>`;
+  }
+  if(m.type==='perfil'){
+    const me=compute()[S.me]||{events:[]};
+    h=`<h2>Mi perfil</h2>
+    <div class="field"><label>Cómo apareces en el ranking</label><input id="m-alias" maxlength="30" value="${esc(alias(S.me))}"></div>
+    <button class="btn" data-act="msavealias" ${S.canWrite?'':'disabled'}>Guardar nombre</button>
+    <div class="sec">Historial de puntos</div>
+    <div class="card" style="background:var(--card2)">${me.events.length?me.events.map(histRow).join(''):'<div class="muted small">Sin movimientos todavía.</div>'}</div>
+    <button class="btn ghost" data-act="mclose">Cerrar</button>`;
+  }
+  if(m.type==='role'){
+    h=`<h2>Probar como…</h2><p class="muted small" style="margin-bottom:14px">En modo demo puedes alternar para ver lo que ve un socio y lo que ves tú como responsable del centro.</p>
+    <div class="stbtns"><button class="${S.demoRole==='socio'?'on':''}" data-role="socio">🏃 Socio</button><button class="${S.demoRole==='admin'?'on':''}" data-role="admin">⚙️ Administrador</button></div>`;
+  }
+  el.innerHTML=`<div class="ov" data-ov="1"><div class="sheet"><div class="grab"></div>${h}</div></div>`;
+  bindModal();
+}
+
+/* ---------- ONBOARDING ---------- */
+function onboard(){
+  return `<div class="app center">
+    <div class="logo" style="width:64px;height:64px;font-size:30px;border-radius:20px;margin-bottom:18px">${esc(initials(centerName()))}</div>
+    <h1 style="font-size:44px;line-height:1">Tus ideas<br><span style="color:var(--acc)">suman puntos.</span></h1>
+    <p class="muted" style="margin:12px 0 22px">Propón mejoras para ${esc(centerName())}, gana puntos cuando se aprueban y canjéalos por premios.</p>
+    <div class="field"><label>¿Cómo quieres aparecer en el ranking?</label><input id="ob-alias" maxlength="30" placeholder="Ej.: Laura G."></div>
+    <button class="btn" id="ob-go">Empezar</button></div>`;
+}
+function bindOnboard(){
+  $('#ob-go').onclick=async()=>{ const a=$('#ob-alias').value.trim(); if(a.length<2) return toast('Escribe un nombre (mín. 2 letras)',1);
+    try{ await store.set('members',S.me,{alias:a,joinedAt:Date.now()}); S.members[S.me]={alias:a}; S.phase='ready'; render(); toast('¡Bienvenido/a, '+a+'! 💪'); }catch(e){ writeFail(e); } };
+}
+
+/* ================== ACCIONES ================== */
+function writeFail(e){
+  if(e&&e.code==='invalid_argument'){ S.canWrite=false; toast('No tienes permiso para guardar cambios aquí',1); render(); }
+  else if(e&&e.code==='quota_exceeded') toast('Se ha llenado la base de datos. Borra ideas antiguas.',1);
+  else toast('No se pudo guardar. Inténtalo de nuevo.',1);
+}
+function go(v){ S.view=v; if(v!=='admin') S.admRewardsDraft=null; render(); window.scrollTo(0,0); }
+
+function bind(){
+  document.querySelectorAll('[data-go]').forEach(b=>b.onclick=e=>{e.preventDefault();go(b.dataset.go);});
+  document.querySelectorAll('[data-filter]').forEach(b=>b.onclick=()=>{S.ideaFilter=b.dataset.filter;render();});
+  document.querySelectorAll('[data-sort]').forEach(b=>b.onclick=()=>{S.ideaSort=b.dataset.sort;render();});
+  document.querySelectorAll('[data-rank]').forEach(b=>b.onclick=()=>{S.rankMode=b.dataset.rank;render();});
+  document.querySelectorAll('[data-adm]').forEach(b=>b.onclick=()=>{S.admTab=b.dataset.adm;S.admRewardsDraft=null;render();});
+  document.querySelectorAll('[data-review]').forEach(b=>b.onclick=()=>openModal({type:'review',id:b.dataset.review}));
+  document.querySelectorAll('[data-redeem]').forEach(b=>b.onclick=()=>openModal({type:'redeem',id:b.dataset.redeem}));
+  document.querySelectorAll('[data-vote]').forEach(b=>b.onclick=()=>toggleVote(b.dataset.vote));
+  document.querySelectorAll('[data-deliv]').forEach(b=>b.onclick=()=>deliver(b.dataset.deliv,b.dataset.s));
+  document.querySelectorAll('[data-cat]').forEach(b=>b.onclick=()=>{ saveDraftInputs(); S.draft.cat=b.dataset.cat; render(); });
+  document.querySelectorAll('[data-act]').forEach(b=>b.onclick=e=>{e.preventDefault();act(b.dataset.act);});
+  // borradores
+  ['f-title','f-text','f-impact'].forEach(id=>{ const el=$('#'+id); if(el) el.oninput=saveDraftInputs; });
+  document.querySelectorAll('[data-rw]').forEach(el=>el.oninput=()=>{ const r=S.admRewardsDraft[+el.dataset.rw]; r[el.dataset.k]=el.dataset.k==='cost'?+el.value:el.value; });
+  document.querySelectorAll('[data-rwdel]').forEach(b=>b.onclick=()=>{ S.admRewardsDraft.splice(+b.dataset.rwdel,1); render(); });
+}
+function saveDraftInputs(){ const t=$('#f-title'),x=$('#f-text'),i=$('#f-impact'); if(t) S.draft.title=t.value; if(x) S.draft.text=x.value; if(i) S.draft.impact=+i.value; }
+
+async function act(a){
+  if(a==='perfil') return openModal({type:'perfil'});
+  if(a==='hist') return openModal({type:'perfil'});
+  if(a==='role') return openModal({type:'role'});
+  if(a==='enviar'){
+    saveDraftInputs(); const d=S.draft;
+    if(d.title.trim().length<4) return toast('Ponle un título (mín. 4 letras)',1);
+    if(d.text.trim().length<10) return toast('Explica un poco más la idea',1);
+    if(!d.cat) return toast('Elige una categoría',1);
+    const id=uid();
+    try{ await store.set('suggestions',id,{authorId:S.me,title:d.title.trim(),text:d.text.trim(),cat:d.cat,impact:+d.impact||0,createdAt:Date.now()});
+      S.draft={title:'',text:'',cat:'',impact:0}; S.ideaFilter='mias'; go('ideas'); toast(`¡Idea enviada! +${rules().submit} pts ⚡`); }catch(e){ writeFail(e); }
+  }
+  if(a==='rwadd'){ S.admRewardsDraft.push({id:'r'+uid(),em:'🎁',name:'',cost:100}); render(); }
+  if(a==='rwsave'){
+    const list=S.admRewardsDraft.filter(r=>String(r.name).trim()&&+r.cost>0).map(r=>({id:r.id||('r'+uid()),em:String(r.em||'🎁').slice(0,4),name:String(r.name).trim().slice(0,60),cost:Math.round(+r.cost)}));
+    if(!list.length) return toast('Añade al menos un premio',1);
+    await saveConfig({rewards:list}); S.admRewardsDraft=null; render(); toast('Premios guardados ✅');
+  }
+  if(a==='cfgsave'){
+    const r={}; Object.keys(DEFAULT_RULES).forEach(k=>{ const v=$('#rl-'+k); r[k]=Math.max(0,Math.round(+v.value||0)); });
+    const c=$('#ch-cat').value; const ch=c?{cat:c,mult:+$('#ch-mult').value}:null;
+    await saveConfig({rules:r,challenge:ch,centerName:$('#cfg-name').value.trim().slice(0,40)}); render(); toast('Ajustes guardados ✅');
+  }
+  if(a==='demoreset'){ store.reset(); toast('Datos de ejemplo restablecidos'); }
+}
+async function saveConfig(patch){
+  const cur=JSON.parse(JSON.stringify(S.config.main||{}));
+  try{ await store.set('config','main',{...cur,...patch,updatedAt:Date.now()}); }catch(e){ writeFail(e); }
+}
+let voting=false;
+async function toggleVote(sid){
+  if(voting) return; voting=true;
+  const key=sid+'__'+S.me;
+  try{ if(S.votes[key]) await store.del('votes',key); else { await store.set('votes',key,{sid,uid:S.me,at:Date.now()}); toast(`¡Voto! +${rules().voteGiven} pt 🔥`); } }
+  catch(e){ writeFail(e); } finally{ voting=false; }
+}
+async function deliver(id,status){ try{ await store.set('deliveries',id,{status,at:Date.now()}); toast(status==='entregado'?'Marcado como entregado 📦':'Canje rechazado; puntos devueltos'); }catch(e){ writeFail(e); } }
+
+function bindModal(){
+  const m=S.modal;
+  $('#modal [data-ov]').onclick=e=>{ if(e.target.dataset.ov) closeModal(); };
+  document.querySelectorAll('#modal [data-act]').forEach(b=>b.onclick=async e=>{ e.preventDefault(); const a=b.dataset.act;
+    if(a==='mclose') return closeModal();
+    if(a==='msave'){
+      const prev=S.reviews[m.id]||{}, now=Date.now(), ch=challenge(), s=S.suggestions[m.id];
+      const bonus=Math.max(0,Math.round(+$('#m-bonus').value||0)), note=$('#m-note').value.trim().slice(0,400);
+      const vRaw=$('#m-value').value; const value=vRaw===''?null:Math.max(0,+vRaw);
+      const mult=prev.mult||((ch&&ch.cat===s.cat&&m.status!=='pendiente')?ch.mult:1);
+      const rv={status:m.status,note,bonus,value,mult,
+        at:(m.status==='aprobada'||m.status==='implementada')?(prev.at&&(prev.status==='aprobada'||prev.status==='implementada')?prev.at:now):now,
+        implAt:m.status==='implementada'?(prev.implAt||now):null};
+      b.disabled=true;
+      try{ await store.set('reviews',m.id,rv); closeModal(); toast('Revisión guardada ✅'); }catch(err){ b.disabled=false; writeFail(err); }
+    }
+    if(a==='mdelete'){
+      if(b.dataset.sure!=='1'){ b.dataset.sure='1'; b.textContent='Pulsa otra vez para eliminar definitivamente'; return; }
+      try{ await store.del('suggestions',m.id); await store.del('reviews',m.id).catch(()=>{}); closeModal(); toast('Idea eliminada'); }catch(err){ writeFail(err); }
+    }
+    if(a==='mredeem'){
+      const r=rewards().find(x=>x.id===m.id), bal=(compute()[S.me]||{}).balance||0;
+      if(bal<r.cost){ closeModal(); return toast('No tienes puntos suficientes',1); }
+      b.disabled=true;
+      try{ await store.set('redemptions',uid(),{uid:S.me,rewardId:r.id,name:r.name,em:r.em||'🎁',cost:r.cost,at:Date.now()}); closeModal(); toast(`¡Canjeado! Recoge tu ${r.name} en recepción 🎁`); }catch(err){ b.disabled=false; writeFail(err); }
+    }
+    if(a==='msavealias'){ const v=$('#m-alias').value.trim(); if(v.length<2) return toast('Mínimo 2 letras',1);
+      try{ await store.set('members',S.me,{...(S.members[S.me]||{joinedAt:Date.now()}),alias:v.slice(0,30)}); closeModal(); toast('Nombre actualizado'); }catch(err){ writeFail(err); } }
+  });
+  document.querySelectorAll('#modal [data-mst]').forEach(b=>b.onclick=()=>{ const keep={bonus:$('#m-bonus').value,value:$('#m-value').value,note:$('#m-note').value}; m.status=b.dataset.mst; renderModal(); $('#m-bonus').value=keep.bonus; $('#m-value').value=keep.value; $('#m-note').value=keep.note; });
+  document.querySelectorAll('#modal [data-role]').forEach(b=>b.onclick=()=>{ S.demoRole=b.dataset.role; if(S.demoRole!=='admin'&&S.view==='admin') S.view='inicio'; closeModal(); render(); toast(S.demoRole==='admin'?'Ahora ves el panel ⚙️ arriba a la derecha':'Viendo como socio'); });
+}
+
+/* ================== ARRANQUE ================== */
+function startWatching(){
+  let pending=new Set(COLLS);
+  const timer=setTimeout(()=>{ if(S.phase==='loading'){ S.loadNote='Los datos tardan en llegar. Comprueba tu conexión.'; render(); } },10000);
+  COLLS.forEach(c=>store.watch(c,(m)=>{
+    S[c==='config'?'config':c]=m;
+    if(pending.has(c)){ pending.delete(c); if(!pending.size){ clearTimeout(timer); S.phase=S.members[S.me]?'ready':'onboard'; render(); return; } }
+    if(S.phase==='onboard' && S.members[S.me]) { S.phase='ready'; }
+    if(!pending.size && S.phase!=='onboard') scheduleRender();
+  },err=>{ clearTimeout(timer); if(S.phase==='loading'){ S.loadNote='No se pudo conectar con los datos.'; render(); } }));
+}
+
+async function init(){
+  render();
+  let db=null, user=null;
+  if(window.claude && typeof window.claude.use==='function'){
+    try{ [db,user]=await Promise.all([window.claude.use('db'),window.claude.use('user')]); }catch(e){}
+  }
+  let id=null;
+  if(db&&user){ try{ id=await user.id(); }catch(e){} }
+  if(db&&user&&id){
+    S.mode='live'; S.me=id; store=makeDbStore(db);
+    try{ S.isAdmin=!!(await user.canEdit()); }catch(e){}
+    try{ const w=await user.can('data.write'); if(w===false) S.canWrite=false; }catch(e){}
+  } else {
+    S.mode='demo'; S.me='demo-yo'; store=makeDemoStore();
+  }
+  startWatching();
+}
+init();
+})();
+</script>
+</body>
+</html>

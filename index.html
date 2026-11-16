@@ -174,6 +174,15 @@ h1,h2,h3,.cond{font-family:'Bebas Neue',system-ui,sans-serif;font-weight:400;let
 .rewedit{display:grid;grid-template-columns:52px 1fr 80px 36px;gap:6px;margin-bottom:8px;align-items:center}
 .rewedit input{padding:10px 8px}
 .x{width:36px;height:36px;border-radius:10px;background:var(--card2);color:var(--bad);font-weight:700}
+.mrow{display:flex;align-items:center;gap:12px;padding:12px 4px;border-bottom:1px solid var(--line)}
+.mrow:last-child{border:0}
+.mrow .nm{flex:1;min-width:0}
+.mrow .nm b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mrow .nm small{display:block;color:var(--mut);font-size:13px;overflow-wrap:anywhere}
+.mrow .iconbtn{width:34px;height:34px;font-size:15px;flex:none}
+.tag{font-size:11px;font-weight:700;padding:2px 7px;border-radius:99px;background:var(--acc-l);color:var(--acc-d);margin-left:6px;vertical-align:middle}
+.chk{display:flex;gap:10px;align-items:flex-start;background:var(--card2);padding:12px;border-radius:12px;font-size:14px}
+.chk input{width:20px;height:20px;flex:none;margin-top:1px;accent-color:var(--acc)}
 .spin{width:36px;height:36px;border:4px solid var(--line);border-top-color:var(--acc);border-radius:50%;animation:sp 0.8s linear infinite;margin:0 auto 14px}
 @keyframes sp{to{transform:rotate(360deg)}}
 </style>
@@ -227,11 +236,11 @@ const STATUS_LBL = {pendiente:'Pendiente', aprobada:'Aprobada', implementada:'Im
 /* ================== ESTADO ================== */
 const S = {
   phase:'loading', mode:null, me:null, isAdmin:false, canWrite:true, demoRole:'socio',
-  members:{}, suggestions:{}, reviews:{}, votes:{}, redemptions:{}, deliveries:{}, config:{},
+  members:{}, suggestions:{}, reviews:{}, votes:{}, redemptions:{}, deliveries:{}, config:{}, blocked:{},
   view:'inicio', ideaFilter:'todas', ideaSort:'recientes', rankMode:'mes', admTab:'revisar',
   draft:{title:'', text:'', cat:'', impact:0}, modal:null, stale:false, loadNote:''
 };
-const COLLS = ['members','suggestions','reviews','votes','redemptions','deliveries','config'];
+const COLLS = ['members','suggestions','reviews','votes','redemptions','deliveries','config','blocked'];
 
 /* ================== UTILIDADES ================== */
 const $ = s => document.querySelector(s);
@@ -248,7 +257,7 @@ const rules = () => ({...DEFAULT_RULES, ...(S.config.main?.rules||{})});
 const rewards = () => (S.config.main?.rewards && S.config.main.rewards.length) ? S.config.main.rewards : DEFAULT_REWARDS;
 const centerName = () => S.config.main?.centerName || 'Silban360';
 const challenge = () => S.config.main?.challenge || null; // {cat, mult}
-const alias = id => S.members[id]?.alias || 'Socio';
+const alias = id => S.members[id]?.alias || 'Antiguo socio';
 const isAdmin = () => S.mode==='demo' ? S.demoRole==='admin' : S.isAdmin;
 
 function toast(msg, err){ const t=$('#toast'); t.innerHTML=`<div class="toast ${err?'err':''}">${esc(msg)}</div>`; clearTimeout(toast._t); toast._t=setTimeout(()=>t.innerHTML='',2600); }
@@ -266,7 +275,7 @@ function makeDbStore(db){
   };
 }
 function makeDemoStore(){
-  const KEY='ideas_que_suman_demo_v1'; let data=null; const subs={};
+  const KEY='ideas_que_suman_demo_v2'; let data=null; const subs={};
   try{ data=JSON.parse(localStorage.getItem(KEY)||'null'); }catch(e){}
   if(!data){ data=demoSeed(); }
   const save=()=>{ try{ localStorage.setItem(KEY, JSON.stringify(data)); }catch(e){} };
@@ -281,7 +290,7 @@ function makeDemoStore(){
 }
 function demoSeed(){
   const d=864e5, n=Date.now();
-  const members={ 'demo-yo':{alias:'Tú (demo)',joinedAt:n-20*d}, m1:{alias:'Laura G.',joinedAt:n-60*d}, m2:{alias:'Carlos M.',joinedAt:n-50*d}, m3:{alias:'Marta R.',joinedAt:n-40*d}, m4:{alias:'Javi P.',joinedAt:n-30*d} };
+  const members={ 'demo-yo':{alias:'Tú (demo)',joinedAt:n-20*d,self:true}, m1:{alias:'Laura G.',email:'laura@ejemplo.com',phone:'600 111 222',joinedAt:n-60*d,addedByAdmin:true}, m2:{alias:'Carlos M.',email:'carlos@ejemplo.com',joinedAt:n-50*d,addedByAdmin:true}, m3:{alias:'Marta R.',phone:'611 333 444',joinedAt:n-40*d,addedByAdmin:true}, m4:{alias:'Javi P.',joinedAt:n-30*d,self:true} };
   const suggestions={
     s1:{authorId:'m1',title:'Bonos de 5 sesiones para parejas',text:'Muchos venimos en pareja. Un bono compartido con algo de descuento animaría a traer a la pareja y entraría más dinero.',cat:'ingresos',impact:750,createdAt:n-12*d},
     s2:{authorId:'m2',title:'Clase de movilidad los sábados',text:'Una clase corta de movilidad el sábado por la mañana. Mucha gente la pagaría aparte.',cat:'entreno',impact:300,createdAt:n-9*d},
@@ -338,13 +347,14 @@ function levelOf(p){ let i=0; LEVELS.forEach((l,k)=>{ if(p>=l.min) i=k; }); cons
 /* ================== RENDER ================== */
 const FORM_VIEWS=new Set(['nueva','admin:premios','admin:ajustes']);
 function viewKey(){ return S.view==='admin' ? 'admin:'+S.admTab : S.view; }
-function scheduleRender(){ if(S.modal || FORM_VIEWS.has(viewKey())){ S.stale=true; return; } render(); }
+function scheduleRender(){ if(S.modal || FORM_VIEWS.has(viewKey()) || document.activeElement?.id==='ms-q'){ S.stale=true; return; } render(); }
 
 function render(){
   S.stale=false;
   const root=$('#root');
   if(S.phase==='loading'){ root.innerHTML=`<div class="app center"><div class="spin"></div><p class="muted" style="text-align:center">Cargando…${S.loadNote?'<br><small>'+esc(S.loadNote)+'</small>':''}</p></div>`; return; }
   if(S.phase==='onboard'){ root.innerHTML=onboard(); bindOnboard(); return; }
+  if(S.phase==='blocked'){ root.innerHTML=`<div class="app center" style="text-align:center"><div style="font-size:56px">🔒</div><h1 style="font-size:36px;margin:10px 0">Acceso retirado</h1><p class="muted">Tu acceso a ${esc(centerName())} · Ideas que suman ha sido retirado. Si crees que es un error, habla con el equipo del centro.</p></div>`; return; }
   const P=compute(), me=P[S.me]||{events:[],earned:0,month:0,balance:0,stats:{}};
   let body='';
   if(S.view==='inicio') body=vInicio(P,me);
@@ -493,13 +503,14 @@ function vAdmin(P){
   const pend=ideaList().filter(i=>i.status==='pendiente');
   const pendR=Object.keys(S.redemptions).filter(id=>!S.deliveries[id]);
   let body='';
+  if(t==='socios') body=vSocios(P);
   if(t==='revisar') body=pend.length?pend.sort((a,b)=>a.createdAt-b.createdAt).map(ideaCard).join(''):`<div class="empty"><em>🎉</em>No hay ideas pendientes de revisar.</div>`;
   if(t==='canjes') body=pendR.length?pendR.map(id=>{ const r=S.redemptions[id]; return `<div class="rew"><div class="em">${esc(r.em||'🎁')}</div><div class="t"><b>${esc(r.name)}</b><span class="muted small">${esc(alias(r.uid))} · ${fmtDate(r.at)} · ${r.cost} pts</span></div><div class="row" style="flex-direction:column;gap:6px"><button class="btn sm ok" data-deliv="${id}" data-s="entregado">Entregado</button><button class="btn sm ghost" data-deliv="${id}" data-s="rechazado">Rechazar</button></div></div>`; }).join(''):`<div class="empty"><em>📦</em>No hay canjes pendientes de entregar.</div>`;
   if(t==='resumen') body=vResumen(P);
   if(t==='premios') body=vAdmRewards();
   if(t==='ajustes') body=vAdmSettings();
   return `<div class="row between" style="margin:4px 0 12px"><h1 style="font-size:32px">Panel del centro</h1><button class="btn sm sec2" data-go="inicio">Cerrar</button></div>
-  <div class="adm-tabs">${ch('revisar','Revisar',pend.length)}${ch('canjes','Canjes',pendR.length)}${ch('resumen','Resumen')}${ch('premios','Premios')}${ch('ajustes','Ajustes')}</div>${body}`;
+  <div class="adm-tabs">${ch('revisar','Revisar',pend.length)}${ch('canjes','Canjes',pendR.length)}${ch('socios','Socios',Object.keys(S.members).length)}${ch('resumen','Resumen')}${ch('premios','Premios')}${ch('ajustes','Ajustes')}</div>${body}`;
 }
 function vResumen(P){
   const all=Object.entries(S.suggestions).map(([id,s])=>({...s,id,status:S.reviews[id]?.status||'pendiente',rv:S.reviews[id]||{}}));
@@ -523,6 +534,19 @@ function vResumen(P){
   <div class="sec">Ideas por categoría</div>
   <div class="card">${byCat.map(x=>`<div style="margin:8px 0"><div class="row between small"><span>${x.c.em} ${esc(x.c.name)}</span><b>${x.n}</b></div><div class="bar" style="height:8px;margin-top:4px"><i style="width:${x.n/maxN*100}%"></i></div></div>`).join('')}</div>
   <div class="card small muted">Puntos repartidos en total: <b style="color:var(--txt)">${ptsOut}</b> · Socios registrados: <b style="color:var(--txt)">${Object.keys(S.members).length}</b></div>`;
+}
+function vSocios(P){
+  const list=Object.entries(S.members).map(([id,m])=>({id,...m,p:P[id]||{earned:0,balance:0,stats:{}}})).sort((a,b)=>String(a.alias).localeCompare(String(b.alias),'es'));
+  return `<div class="row" style="margin-bottom:12px"><input id="ms-q" placeholder="🔍 Buscar por nombre, email o teléfono" style="flex:1"><button class="btn sm" data-act="addmember" style="white-space:nowrap">+ Añadir</button></div>
+  <p class="muted small" style="margin:-4px 0 10px">${list.length} ${list.length===1?'persona':'personas'} en la app</p>
+  <div class="card" id="ms-list">${list.length?list.map(x=>`<div class="mrow" data-q="${esc((x.alias+' '+(x.email||'')+' '+(x.phone||'')).toLowerCase())}">
+    <div class="av">${esc(initials(x.alias))}</div>
+    <div class="nm"><b>${esc(x.alias)}${x.id===S.me?'<span class="tag">Tú</span>':''}</b>
+      <small>${esc([x.email,x.phone].filter(Boolean).join(' · ')||'Sin datos de contacto')}</small>
+      <small>⚡ ${x.p.balance} pts · ${x.p.stats.ideas||0} ${(x.p.stats.ideas||0)===1?'idea':'ideas'} · ${levelOf(x.p.earned).cur.em}</small></div>
+    <button class="iconbtn" data-editm="${x.id}" aria-label="Editar">✏️</button>
+    ${x.id===S.me?'':`<button class="iconbtn" data-rmm="${x.id}" aria-label="Quitar" style="color:var(--bad)">🗑️</button>`}
+  </div>`).join(''):`<div class="empty"><em>👥</em>Aún no hay nadie. Añade a tus socios.</div>`}</div>`;
 }
 function vAdmRewards(){
   const list=(S.admRewardsDraft=S.admRewardsDraft||JSON.parse(JSON.stringify(rewards())));
@@ -582,6 +606,22 @@ function renderModal(){
     <div class="card" style="background:var(--card2)">${me.events.length?me.events.map(histRow).join(''):'<div class="muted small">Sin movimientos todavía.</div>'}</div>
     <button class="btn ghost" data-act="mclose">Cerrar</button>`;
   }
+  if(m.type==='member'){
+    const x=m.id?S.members[m.id]:{};
+    h=`<h2>${m.id?'Editar persona':'Añadir persona'}</h2>
+    <p class="muted small">${m.id?'Cambia sus datos. Sus puntos e ideas se mantienen.':'Dale de alta para que aparezca en el ranking. Guarda su email: servirá para que inicie sesión cuando la app tenga acceso con cuenta.'}</p>
+    <div class="field"><label>Nombre *</label><input id="mm-name" maxlength="30" value="${esc(x.alias||'')}" placeholder="Ej.: Laura García"></div>
+    <div class="field"><label>Email</label><input id="mm-email" type="email" maxlength="80" value="${esc(x.email||'')}" placeholder="laura@email.com"></div>
+    <div class="field"><label>Teléfono</label><input id="mm-phone" type="tel" maxlength="20" value="${esc(x.phone||'')}" placeholder="600 000 000"></div>
+    <div class="row"><button class="btn ghost" data-act="mclose">Cancelar</button><button class="btn" data-act="msavemember">${m.id?'Guardar':'Añadir'}</button></div>`;
+  }
+  if(m.type==='rmmember'){
+    const x=S.members[m.id]||{}, st=(compute()[m.id]||{}).stats||{};
+    h=`<h2>Quitar a ${esc(x.alias||'esta persona')}</h2>
+    <p class="muted" style="margin-bottom:12px">Dejará de aparecer en la app y en el ranking${x.self?' y no podrá volver a entrar':''}.</p>
+    <label class="chk"><input type="checkbox" id="rm-data"><span>Borrar también sus <b>${st.ideas||0} ideas</b>, sus votos y sus canjes. Si no lo marcas, sus ideas se quedan como “Antiguo socio”.</span></label>
+    <div class="row" style="margin-top:16px"><button class="btn ghost" data-act="mclose">Cancelar</button><button class="btn bad" data-act="mremove">Quitar</button></div>`;
+  }
   if(m.type==='role'){
     h=`<h2>Probar como…</h2><p class="muted small" style="margin-bottom:14px">En modo demo puedes alternar para ver lo que ve un socio y lo que ves tú como responsable del centro.</p>
     <div class="stbtns"><button class="${S.demoRole==='socio'?'on':''}" data-role="socio">🏃 Socio</button><button class="${S.demoRole==='admin'?'on':''}" data-role="admin">⚙️ Administrador</button></div>`;
@@ -601,7 +641,7 @@ function onboard(){
 }
 function bindOnboard(){
   $('#ob-go').onclick=async()=>{ const a=$('#ob-alias').value.trim(); if(a.length<2) return toast('Escribe un nombre (mín. 2 letras)',1);
-    try{ await store.set('members',S.me,{alias:a,joinedAt:Date.now()}); S.members[S.me]={alias:a}; S.phase='ready'; render(); toast('¡Bienvenido/a, '+a+'! 💪'); }catch(e){ writeFail(e); } };
+    try{ await store.set('members',S.me,{alias:a,joinedAt:Date.now(),self:true}); S.members[S.me]={alias:a}; S.phase='ready'; render(); toast('¡Bienvenido/a, '+a+'! 💪'); }catch(e){ writeFail(e); } };
 }
 
 /* ================== ACCIONES ================== */
@@ -624,6 +664,9 @@ function bind(){
   document.querySelectorAll('[data-deliv]').forEach(b=>b.onclick=()=>deliver(b.dataset.deliv,b.dataset.s));
   document.querySelectorAll('[data-cat]').forEach(b=>b.onclick=()=>{ saveDraftInputs(); S.draft.cat=b.dataset.cat; render(); });
   document.querySelectorAll('[data-act]').forEach(b=>b.onclick=e=>{e.preventDefault();act(b.dataset.act);});
+  document.querySelectorAll('[data-editm]').forEach(b=>b.onclick=()=>openModal({type:'member',id:b.dataset.editm}));
+  document.querySelectorAll('[data-rmm]').forEach(b=>b.onclick=()=>openModal({type:'rmmember',id:b.dataset.rmm}));
+  const q=$('#ms-q'); if(q){ q.value=S.memberQuery||''; const f=()=>{ S.memberQuery=q.value; const v=q.value.trim().toLowerCase(); document.querySelectorAll('#ms-list [data-q]').forEach(r=>r.style.display=!v||r.dataset.q.includes(v)?'':'none'); }; q.oninput=f; q.onblur=()=>{ if(S.stale && !S.modal) render(); }; f(); }
   // borradores
   ['f-title','f-text','f-impact'].forEach(id=>{ const el=$('#'+id); if(el) el.oninput=saveDraftInputs; });
   document.querySelectorAll('[data-rw]').forEach(el=>el.oninput=()=>{ const r=S.admRewardsDraft[+el.dataset.rw]; r[el.dataset.k]=el.dataset.k==='cost'?+el.value:el.value; });
@@ -633,6 +676,7 @@ function saveDraftInputs(){ const t=$('#f-title'),x=$('#f-text'),i=$('#f-impact'
 
 async function act(a){
   if(a==='perfil') return openModal({type:'perfil'});
+  if(a==='addmember') return openModal({type:'member'});
   if(a==='hist') return openModal({type:'perfil'});
   if(a==='role') return openModal({type:'role'});
   if(a==='enviar'){
@@ -696,6 +740,29 @@ function bindModal(){
       b.disabled=true;
       try{ await store.set('redemptions',uid(),{uid:S.me,rewardId:r.id,name:r.name,em:r.em||'🎁',cost:r.cost,at:Date.now()}); closeModal(); toast(`¡Canjeado! Recoge tu ${r.name} en recepción 🎁`); }catch(err){ b.disabled=false; writeFail(err); }
     }
+    if(a==='msavemember'){
+      const name=$('#mm-name').value.trim(), email=$('#mm-email').value.trim().toLowerCase(), phone=$('#mm-phone').value.trim();
+      if(name.length<2) return toast('Escribe el nombre (mín. 2 letras)',1);
+      if(email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return toast('El email no parece válido',1);
+      if(email && Object.entries(S.members).some(([k,v])=>k!==m.id&&v.email===email)) return toast('Ya hay alguien con ese email',1);
+      const id=m.id||('p-'+uid()), prev=S.members[id]||{joinedAt:Date.now(),addedByAdmin:true};
+      b.disabled=true;
+      try{ await store.set('members',id,{...prev,alias:name.slice(0,30),email,phone:phone.slice(0,20)}); closeModal(); toast(m.id?'Datos actualizados':'¡'+name+' añadido/a! 👋'); }catch(err){ b.disabled=false; writeFail(err); }
+    }
+    if(a==='mremove'){
+      const id=m.id, x=S.members[id]||{}, wipe=$('#rm-data').checked;
+      b.disabled=true;
+      try{
+        if(x.self) await store.set('blocked',id,{at:Date.now(),alias:x.alias||''});
+        await store.del('members',id);
+        if(wipe){
+          for(const [sid,s] of Object.entries(S.suggestions)) if(s.authorId===id){ await store.del('suggestions',sid); await store.del('reviews',sid).catch(()=>{}); for(const k of Object.keys(S.votes)) if(S.votes[k].sid===sid) await store.del('votes',k).catch(()=>{}); }
+          for(const k of Object.keys(S.votes)) if(S.votes[k]?.uid===id) await store.del('votes',k).catch(()=>{});
+          for(const [rid,r] of Object.entries(S.redemptions)) if(r.uid===id){ await store.del('redemptions',rid); await store.del('deliveries',rid).catch(()=>{}); }
+        }
+        closeModal(); toast((x.alias||'Persona')+' quitado/a de la app');
+      }catch(err){ b.disabled=false; writeFail(err); }
+    }
     if(a==='msavealias'){ const v=$('#m-alias').value.trim(); if(v.length<2) return toast('Mínimo 2 letras',1);
       try{ await store.set('members',S.me,{...(S.members[S.me]||{joinedAt:Date.now()}),alias:v.slice(0,30)}); closeModal(); toast('Nombre actualizado'); }catch(err){ writeFail(err); } }
   });
@@ -709,7 +776,8 @@ function startWatching(){
   const timer=setTimeout(()=>{ if(S.phase==='loading'){ S.loadNote='Los datos tardan en llegar. Comprueba tu conexión.'; render(); } },10000);
   COLLS.forEach(c=>store.watch(c,(m)=>{
     S[c==='config'?'config':c]=m;
-    if(pending.has(c)){ pending.delete(c); if(!pending.size){ clearTimeout(timer); S.phase=S.members[S.me]?'ready':'onboard'; render(); return; } }
+    if(pending.has(c)){ pending.delete(c); if(!pending.size){ clearTimeout(timer); S.phase=S.blocked[S.me]?'blocked':(S.members[S.me]?'ready':'onboard'); render(); return; } }
+    if(!pending.size && S.blocked[S.me] && S.phase!=='blocked'){ S.phase='blocked'; closeModal(); render(); return; }
     if(S.phase==='onboard' && S.members[S.me]) { S.phase='ready'; }
     if(!pending.size && S.phase!=='onboard') scheduleRender();
   },err=>{ clearTimeout(timer); if(S.phase==='loading'){ S.loadNote='No se pudo conectar con los datos.'; render(); } }));
